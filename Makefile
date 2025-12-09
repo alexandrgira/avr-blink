@@ -1,10 +1,15 @@
 MCU = atmega328p
 F_CPU = 16000000UL
+PORT := $(shell ls /dev/ttyUSB* 2>/dev/null | head -n 1)
+ifeq ($(PORT),)
+PORT := $(shell ls /dev/ttyACM* 2>/dev/null | head -n 1)
+endif
+
+$(info Using port: $(PORT))
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 AVRDUDE = avrdude
-PORT = COM3
 PROGRAMMER = arduino
 
 CFLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os
@@ -22,4 +27,4 @@ flash: main.hex
 	$(AVRDUDE) -c $(PROGRAMMER) -p $(MCU) -P $(PORT) -U flash:w:main.hex:i
 
 clean:
-	del *.elf *.hex
+	rm *.elf *.hex
